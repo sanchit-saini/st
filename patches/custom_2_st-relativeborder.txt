@@ -1,0 +1,39 @@
+diff --git a/config.def.h b/config.def.h
+--- a/config.def.h
++++ b/config.def.h
+@@ -4,10 +4,11 @@
+  * appearance
+  *
+  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
++ * borderperc: percentage of cell width to use as a border
++ *	 0 = no border, 100 = border width is same as cell width
+  */
+ static char *font = "Liberation Mono:pixelsize=18:antialias=true:autohint=true";
+-static int borderpx = 2;
+-
++int borderperc = 0; int borderpx = 0;
+ /*
+  * What program is execed by st depends of these precedence rules:
+  * 1: program passed with -e
+diff --git a/st.h b/st.h
+--- a/st.h
++++ b/st.h
+@@ -126,3 +126,4 @@ extern unsigned int tabspaces;
+ extern unsigned int defaultfg;
+ extern unsigned int defaultbg;
+ extern float alpha;
++extern int borderperc;
+diff --git a/x.c b/x.c
+--- a/x.c
++++ b/x.c
+@@ -1016,7 +1016,9 @@ xloadfonts(const char *fontstr, double fontsize)
+ 	win.cw = ceilf(dc.font.width * cwscale);
+ 	win.ch = ceilf(dc.font.height * chscale);
+ 
+-	FcPatternDel(pattern, FC_SLANT);
++	borderpx = ceilf(((float)borderperc / 100) * win.cw);
++
++  FcPatternDel(pattern, FC_SLANT);
+ 	FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ITALIC);
+ 	if (xloadfont(&dc.ifont, pattern))
+ 		die("can't open font %s\n", fontstr);
